@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Information</title>
+    <script>
+        function getCourseInfo() {
+            let courseName = document.getElementById("courseSelect").value;
+
+            if (courseName === "") {
+                document.getElementById("output").innerHTML = "Please select a course.";
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("output").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // AJAX request to the same file
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("courseName=" + encodeURIComponent(courseName));
+        }
+    </script>
+</head>
+<body>
+    <h2>Course Information</h2>
+    <label for="courseSelect">Select a course:</label>
+    <select id="courseSelect" onchange="getCourseInfo()">
+        <option value="">--Select--</option>
+        <option value="Web Development">Web Development</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Cybersecurity">Cybersecurity</option>
+    </select>
+
+    <div id="output" style="margin-top:10px; border:1px solid #ccc; padding:10px;"></div>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $courseName = $_POST["courseName"];
+
+        $xmlData = <<<XML
+        <courses>
+            <course>
+                <name>Web Development</name>
+                <duration>6 months</duration>
+                <fee>15000 INR</fee>
+                <description>Learn HTML, CSS, JavaScript, and frameworks to build websites.</description>
+            </course>
+            <course>
+                <name>Data Science</name>
+                <duration>12 months</duration>
+                <fee>30000 INR</fee>
+                <description>Master Python, Machine Learning, and Big Data Analytics.</description>
+            </course>
+            <course>
+                <name>Cybersecurity</name>
+                <duration>9 months</duration>
+                <fee>20000 INR</fee>
+                <description>Learn to protect systems and data from cyber threats.</description>
+            </course>
+        </courses>
+        XML;
+
+        $xml = simplexml_load_string($xmlData);
+
+        foreach ($xml->course as $course) {
+            if ($course->name == $courseName) {
+                echo "<strong>Course Name:</strong> " . $course->name . "<br>";
+                echo "<strong>Duration:</strong> " . $course->duration . "<br>";
+                echo "<strong>Fee:</strong> " . $course->fee . "<br>";
+                echo "<strong>Description:</strong> " . $course->description . "<br>";
+                exit;
+            }
+        }
+
+        echo "Course not found.";
+    }
+    ?>
+</body>
+</html>
