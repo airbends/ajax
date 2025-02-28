@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get Book Details</title>
+    <script>
+        function getBookDetails() {
+            let bookTitle = document.getElementById("bookSelect").value;
+
+            if (bookTitle === "") {
+                document.getElementById("result").innerHTML = "Please select a book.";
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("result").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // AJAX request sent to the same file
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("title=" + encodeURIComponent(bookTitle));
+        }
+    </script>
+</head>
+<body>
+    <h2>Book Details</h2>
+    <label for="bookSelect">Select a book:</label>
+    <select id="bookSelect" onchange="getBookDetails()">
+        <option value="">--Select--</option>
+        <option value="Harry Potter">Harry Potter</option>
+        <option value="The Hobbit">The Hobbit</option>
+        <option value="The Alchemist">The Alchemist</option>
+    </select>
+
+    <div id="result" style="margin-top:20px;"></div>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $title = $_POST["title"];
+
+        // Embedded XML data
+        $xmlData = <<<XML
+        <books>
+            <book>
+                <title>Harry Potter</title>
+                <author>J.K. Rowling</author>
+                <year>1997</year>
+                <price>499</price>
+            </book>
+            <book>
+                <title>The Hobbit</title>
+                <author>J.R.R. Tolkien</author>
+                <year>1937</year>
+                <price>399</price>
+            </book>
+            <book>
+                <title>The Alchemist</title>
+                <author>Paulo Coelho</author>
+                <year>1988</year>
+                <price>299</price>
+            </book>
+        </books>
+        XML;
+
+        // Load the XML data
+        $xml = simplexml_load_string($xmlData);
+
+        // Search for the book
+        foreach ($xml->book as $book) {
+            if ($book->title == $title) {
+                echo "<strong>Title:</strong> " . $book->title . "<br>";
+                echo "<strong>Author:</strong> " . $book->author . "<br>";
+                echo "<strong>Year:</strong> " . $book->year . "<br>";
+                echo "<strong>Price:</strong> ₹" . $book->price . "<br>";
+                exit;
+            }
+        }
+
+        echo "Book not found.";
+    }
+    ?>
+</body>
+</html>
