@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Suggestions</title>
+    <script>
+        function fetchSuggestions() {
+            let query = document.getElementById("search").value;
+
+            if (query === "") {
+                document.getElementById("suggestions").innerHTML = "";
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("suggestions").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // AJAX request to the same file
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("query=" + encodeURIComponent(query));
+        }
+    </script>
+</head>
+<body>
+    <h2>Search Suggestions</h2>
+    <label for="search">Type to search:</label>
+    <input type="text" id="search" onkeyup="fetchSuggestions()" placeholder="Start typing...">
+    <div id="suggestions" style="margin-top:10px; border:1px solid #ccc; padding:10px;"></div>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $query = strtolower($_POST["query"]);
+        $suggestions = [
+            "apple", "banana", "cherry", "date", "elderberry",
+            "fig", "grape", "honeydew", "kiwi", "lemon", "mango",
+            "nectarine", "orange", "papaya", "peach", "pear", "plum",
+            "raspberry", "strawberry", "tangerine", "watermelon"
+        ];
+
+        $results = array_filter($suggestions, function($item) use ($query) {
+            return strpos(strtolower($item), $query) !== false;
+        });
+
+        if (count($results) > 0) {
+            echo implode("<br>", $results);
+        } else {
+            echo "No suggestions found.";
+        }
+    }
+    ?>
+</body>
+</html>
