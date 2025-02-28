@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Username Validation with SQL</title>
+    <script>
+        function validateUsername() {
+            let username = document.getElementById("username").value;
+            let xhr = new XMLHttpRequest();
+
+            // AJAX call to handle validation
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("result").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // The same file processes this
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("username=" + encodeURIComponent(username));
+        }
+    </script>
+</head>
+<body>
+    <h2>Username Validation</h2>
+    <label>Enter Username:</label>
+    <input type="text" id="username" onkeyup="validateUsername()">
+    <div id="result"></div>
+
+    <?php
+    // Database connection
+    $conn = mysqli_connect("localhost", "root", "", "user_db");
+
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    // Handle the AJAX request
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $username = mysqli_real_escape_string($conn, $_POST["username"]);
+
+        // Perform SQL query to validate username
+        if (empty($username)) {
+            echo "Enter username";
+        } elseif (strlen($username) < 3) {
+            echo "Username is too short";
+        } else {
+            $sql = "SELECT * FROM users WHERE username='$username'";
+            $result = mysqli_query($conn, $sql);
+
+            if (mysqli_num_rows($result) > 0) {
+                echo "Username is valid and exists";
+            } else {
+                echo "Username does not exist";
+            }
+        }
+    }
+
+    mysqli_close($conn);
+    ?>
+</body>
+</html>
