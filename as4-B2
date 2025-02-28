@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get Player Details</title>
+    <script>
+        function getPlayerDetails() {
+            let playerName = document.getElementById("playerSelect").value;
+
+            if (playerName === "") {
+                document.getElementById("result").innerHTML = "Please select a player.";
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("result").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // AJAX request to the same file
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("playerName=" + encodeURIComponent(playerName));
+        }
+    </script>
+</head>
+<body>
+    <h2>Player Details</h2>
+    <label for="playerSelect">Select a player:</label>
+    <select id="playerSelect" onchange="getPlayerDetails()">
+        <option value="">--Select--</option>
+        <option value="Sachin Tendulkar">Sachin Tendulkar</option>
+        <option value="Muttiah Muralitharan">Muttiah Muralitharan</option>
+        <option value="Jacques Kallis">Jacques Kallis</option>
+    </select>
+
+    <div id="result" style="margin-top:10px; border:1px solid #ccc; padding:10px;"></div>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $playerName = $_POST["playerName"];
+
+        $xmlData = <<<XML
+        <players>
+            <player>
+                <name>Sachin Tendulkar</name>
+                <country>India</country>
+                <wickets>200</wickets>
+                <runs>18426</runs>
+            </player>
+            <player>
+                <name>Muttiah Muralitharan</name>
+                <country>Sri Lanka</country>
+                <wickets>800</wickets>
+                <runs>1261</runs>
+            </player>
+            <player>
+                <name>Jacques Kallis</name>
+                <country>South Africa</country>
+                <wickets>292</wickets>
+                <runs>11579</runs>
+            </player>
+        </players>
+        XML;
+
+        $xml = simplexml_load_string($xmlData);
+
+        foreach ($xml->player as $player) {
+            if ($player->name == $playerName) {
+                echo "<strong>Name:</strong> " . $player->name . "<br>";
+                echo "<strong>Country:</strong> " . $player->country . "<br>";
+                echo "<strong>Wickets:</strong> " . $player->wickets . "<br>";
+                echo "<strong>Runs:</strong> " . $player->runs . "<br>";
+                exit;
+            }
+        }
+
+        echo "Player not found.";
+    }
+    ?>
+</body>
+</html>
