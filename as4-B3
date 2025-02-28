@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Tutorials</title>
+    <script>
+        function searchTutorial() {
+            let query = document.getElementById("searchBox").value;
+
+            if (query === "") {
+                document.getElementById("results").innerHTML = "Enter a tutorial to search.";
+                return;
+            }
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("results").innerHTML = this.responseText;
+                }
+            };
+            xhr.open("POST", "", true); // AJAX request to the same file
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("query=" + encodeURIComponent(query));
+        }
+    </script>
+</head>
+<body>
+    <h2>Search Your Favorite Tutorial</h2>
+    <label for="searchBox">Type Tutorial Name:</label>
+    <input type="text" id="searchBox" onkeyup="searchTutorial()" placeholder="Enter tutorial name">
+    <div id="results" style="margin-top:10px; border:1px solid #ccc; padding:10px;"></div>
+
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $query = strtolower($_POST["query"]);
+
+        $tutorials = [
+            "html" => "Learn the basics of HTML.",
+            "css" => "Explore the power of CSS for styling webpages.",
+            "javascript" => "Master the fundamentals of JavaScript programming.",
+            "php" => "Dive into server-side scripting with PHP.",
+            "ajax" => "Understand how to use AJAX for asynchronous requests.",
+            "mysql" => "Learn to manage databases using MySQL.",
+            "react" => "Build dynamic UIs with React.js.",
+            "nodejs" => "Develop backend applications using Node.js."
+        ];
+
+        $results = [];
+        foreach ($tutorials as $key => $description) {
+            if (strpos($key, $query) !== false) {
+                $results[] = "<strong>" . ucfirst($key) . ":</strong> " . $description;
+            }
+        }
+
+        if (count($results) > 0) {
+            echo implode("<br>", $results);
+        } else {
+            echo "No matching tutorials found.";
+        }
+    }
+    ?>
+</body>
+</html>
