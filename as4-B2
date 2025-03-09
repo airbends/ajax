@@ -17,7 +17,7 @@
                     document.getElementById("result").innerHTML = this.responseText;
                 }
             };
-            xhr.open("POST", "", true); // AJAX request to the same file
+            xhr.open("POST", "", true); 
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.send("playerName=" + encodeURIComponent(playerName));
         }
@@ -42,16 +42,16 @@
         $xmlData = <<<XML
         <players>
             <player>
-                <name>Sachin Tendulkar</name>
+                <name>Virat Kolhi</name>
+                <country>India</country>
+                <wickets>200</wickets>
+                <runs>50426</runs>
+            </player>
+            <player>
+               <name>Sachin Tendulkar</name>
                 <country>India</country>
                 <wickets>200</wickets>
                 <runs>18426</runs>
-            </player>
-            <player>
-                <name>Muttiah Muralitharan</name>
-                <country>Sri Lanka</country>
-                <wickets>800</wickets>
-                <runs>1261</runs>
             </player>
             <player>
                 <name>Jacques Kallis</name>
